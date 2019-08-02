@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block head %} 
+<script src="https://cdn.tiny.cloud/1/vzj9b5m80j5ply8orjglli44tw57gmqwezebubf8azsyqnqv/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+	tinymce.init({
+		selector: '.mytextarea',
+		menubar: false,
+		plugins: [
+		'advlist autolink lists link image charmap print preview anchor textcolor',
+		'searchreplace visualblocks code fullscreen',
+		'insertdatetime media table paste code help wordcount', 
+		'nonbreaking'
+		],
+		force_br_newlines : true,
+		force_p_newlines : false,
+		forced_root_block : '',
+		toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+		
+
+		// MAKE TAB NOT SWITCH FIELDS
+		setup: function(ed) {
+   			ed.on('keydown', function(event) {
+        	
+            if (event.keyCode==9) {
+                ed.execCommand('mceInsertContent', false, '<span>&emsp;&emsp;</span>');
+                tinymce.dom.Event.cancel(event);
+                return;
+            }
+    });
+		}
+	});
+</script>
+<style> 
+.form-control-label.required:after {
+  content:" *";
+  color:red;
+}
+</style>
+		
+
+
+{% endblock head %}
+
+
+{% block title %} Add Supplier {% endblock title %}
+
+
+{% block content %}
+<p></p>
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-xs-1 center block">
+			{% if editing %}
+			<h1>Edit Supplier</h1>
+			{% else %}
+			<h1>Add Supplier</h1>
+			{% endif %}
+		</div>
+	</div>
+	<p></p>
+	
+	<form method="POST">
+
+		{{ form.csrf_token }}
+		<div class="row">
+
+			<div class="col">
+				<div class="form-group">
+					{{ form.supplier.label(class="form-control-label required") }}
+					{{ form.supplier(class="form-control form-control") }}
+				</div>
+				<div class="form-group">
+					{{ form.sender_email.label(class="form-control-label required") }}
+					{{ form.sender_email(class="form-control form-control") }}
+				</div>
+				<div class="form-group">
+					{{ form.subject_line.label(class="form-control-label required") }}
+					{{ form.subject_line(class="form-control form-control") }}
+				</div>
+			</div>
+		</div>
+		<p> The bodies of the emails NEED to contain both "<b>{name}</b>" (for data contact's first name) and "<b>{prev_month}</b>" in it. </p>
+		<div class="row">
+			<div class="col">
+				<div class="form-group">
+					<label class="form-control-label required" for="first_email"> <b>First</b> Reminder: </label>
+					{% if first_email %}
+					<textarea class="mytextarea" id="first_email" name="first_email_body" style="height:400px">{{first_email}}</textarea>
+					{% else %}
+					<textarea class="mytextarea" id="first_email" name="first_email_body" style="height:400px"></textarea>
+					{% endif %}
+				</div>
+			</div>
+			<div class="col">
+				<div class="form-group">
+
+					<label class="form-control-label required" for="second_email"> <b>Second</b> Reminder: </label>
+					{% if second_email %}
+					<textarea class="mytextarea" id="second_email" name="second_email_body" style="height:400px">{{second_email}}</textarea>
+					{% else %}
+					<textarea class="mytextarea" id="second_email" name="second_email_body" style="height:400px"></textarea>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-xs-1 center block">
+				<div class="form-group">
+					{{ form.submit(class="btn btn-outline-info") }}
+					{% if editing %}
+					{{ form.delete(class="btn btn-danger")}}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+	</form>
+	<script>
+
+		var delete_button = document.getElementById("delete");
+		if (delete_button != null){
+		delete_button.onclick = function () {
+			if (confirm('Are you SURE you want to delete this supplier? It will DELETE ALL DISTRIBUTORS associated with this supplier.')){
+				delete_button.submit();
+			} else{
+				return false;
+			}
+		}
+	}
+
+	</script>
+</div>
+
+{% endblock content %}

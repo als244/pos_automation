@@ -1,0 +1,160 @@
+{% extends "layout.html" %}
+
+{% block head %} 
+<style> 
+.form-control-label.required:after {
+  content:" *";
+  color:red;
+}
+</style>
+{% endblock head %}
+
+
+{% block title %}
+
+{% if editing %}
+Edit Distributor
+{% else %}
+Add Distributor
+{% endif %}
+{% endblock title %}
+
+
+{% block content %}
+<p></p>
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-xs-1 center block">
+			{% if editing %}
+			<h1>Edit Distributor</h1>
+			{% else %}
+			<h1>Add Distributor</h1>
+			{% endif %}
+		</div>
+	</div>
+	<p></p>
+	<form method="POST">
+
+		{{ form.csrf_token }}
+
+
+		<div class="row">
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title"> Data Feed</h4>
+
+						<div class="form-group">
+							{{ form.supplier.label(class="form-control-label")}}
+							{% if editing %}
+							{{ form.supplier(class="form-control-sm form-control", disabled=True) }}
+							{% else %}
+							{{ form.supplier(class="form-control-sm form-control") }}
+							{% endif %}
+						</div>
+						<div class="form-group">
+							{{ form.distributor.label(class="form-control-label required") }}
+							{{ form.distributor(class="form-control-sm form-control") }}
+						</div>
+
+					</div>
+				</div>
+				<p></p>
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title"> Receiving POS Data</h4>
+						<div class="form-group">
+							{{ form.delivery_method.label(class="form-control-label required") }}
+							{{ form.delivery_method(class="form-control form-control-sm") }}
+						</div>
+						<div class="form-group">
+							{{ form.ftp_path.label(class="form-control-label")}}
+							{{ form.ftp_path(class="form-control form-control-sm") }}
+						</div>
+						<div class="form-group">
+							{{ form.business_day_expected.label(class="form-control-label required") }}
+							{{ form.business_day_expected(class="form-control form-control-sm") }}
+						</div>
+						<div class="form-check">
+							{{ form.received_data(class="form-check-input") }}
+							{{ form.received_data.label(class="form-check-label") }}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title"> Reminders</h4>
+						<div class="form-check form-group">
+
+							{{ form.will_send_reminders(class="form-check-input") }}
+							{{ form.will_send_reminders.label(class="form-check-label") }}
+						</div>
+						<div class="form-group">
+							{{ form.reminders_sent.label(class="form-control-label") }}
+							{{ form.reminders_sent(class="form-control form-control-sm") }}
+						</div>
+						{% if editing %}
+						<div class="form-group">
+							{{ form.override_second_reminder_date.label(class="form-control-label") }}
+							{{ form.override_second_reminder_date(class="form-control form-control-sm", placeholder="mm/dd/yyyy") }}
+						</div>
+						{% endif %}
+					</div>
+				</div>
+				<p></p>
+				<div class = "card">
+					<div class ="card-body">
+						<h4 class="card-title"> Internal Settings</h4>
+						<div class="form-check form-group">
+							{{ form.data_import(class="form-check-input") }}
+							{{ form.data_import.label(class="form-check-label") }}
+						</div>
+						<div class="form-check form-group">
+							{{ form.internally_notify(class="form-check-input") }}
+							{{ form.internally_notify.label(class="form-check-label") }}
+						</div>
+						<div class="form-group">
+							{{ form.save_to_path.label(class="form-control-label required")}}
+							{{ form.save_to_path(class="form-control form-control-sm") }}
+						</div>
+						<div class="form-group">
+							{{ form.sql_template_path.label(class="form-control-label")}}
+							{{ form.sql_template_path(class="form-control form-control-sm") }}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<p></p>
+		<div class="row justify-content-center">
+			<div class="col-xs-1 center block">
+				<div class="form-group">
+					{{ form.submit(class="btn btn-outline-info") }}
+					{% if editing %}
+					{{ form.delete(class="btn btn-danger")}}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+
+	</form>
+</div>	
+<script>
+
+	var delete_button = document.getElementById("delete");
+	if (delete_button != null){
+	delete_button.onclick = function () {
+		if (confirm('Are you sure you want to delete this distributor?')){
+			delete_button.submit();
+		} else{
+			return false;
+		}
+	}
+}
+
+</script>
+{% endblock content %}

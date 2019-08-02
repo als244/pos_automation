@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block head %}  {% endblock head %}
+
+
+{% block title %} Edit Distributor {% endblock title %}
+
+
+{% block content %}
+<p></p>
+<div class="container">
+	
+	<div class="row justify-content-center">
+		<div class="col-xs-1 center block">
+			<h1>Select Contact</h1>
+		</div>
+	</div>
+	<p></p>
+
+	<form method="POST">
+		{{ form.csrf_token }}
+		<div class="row justify-content-center">
+			<div class="col">
+
+				<div class="form-group">
+					{{ form.supplier.label(class="form-control-label") }}
+					{{ form.supplier(class="form-control form-control-lg") }}
+				</div>
+				<div class="form-group">
+					{{ form.distributor.label(class="form-control-label") }}
+					{{ form.distributor(class="form-control form-control-lg") }}
+				</div>
+				<div class="form-group">
+					{{ form.contact.label(class="form-control-label") }}
+					{{ form.contact(class="form-control form-control-lg") }}
+				</div>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-xs-1 center block">
+				<div class="form-group">
+					{{ form.submit(class="btn btn-outline-info") }}
+				</div>
+			</div>
+		</div>
+	</form>
+	<script>	
+
+		var supplier_select = document.getElementById("supplier");
+		var distributor_select = document.getElementById("distributor");
+		var contact_select = document.getElementById("contact")
+
+		supplier_select.onchange = function () {
+
+			supplier = supplier_select.value;
+			fetch('/automation/select/distributor/' + supplier).then(function(response) {
+				response.json().then(function(data){
+					var optionHTML = '';
+					var selected = ' selected';
+					for (var d of data.distributors){
+						optionHTML += '<option value=' + d.id + selected +  '>' + d.distributor  +  '</option>';
+						selected = '';
+					}
+					distributor_select.innerHTML = optionHTML;
+				})
+			});
+			var event = new Event('change');
+			distributor_select.dispatchEvent(event);
+		}
+
+		distributor_select.onchange = function() {
+			
+			distributor = distributor_select.value;
+			if (!distributor){
+				console.log('no distributor');
+				contact_select.innerHTML = '';
+			}
+			else{
+				fetch('/automation/select/contact/' + distributor).then(function(response) {
+					response.json().then(function(data){
+						var optionHTML = '';
+						console.log(data.contacts)
+						for (var c of data.contacts){
+							optionHTML += '<option value=' + c.id + '>' + c.first_name + ' ' + c.last_name + '</option>';
+						}
+						contact_select.innerHTML = optionHTML;
+					})
+				});
+			}
+		}
+	</script>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+
+{% block head %} 
+<style>
+.form-control-label.required:after {
+  content:" *";
+  color:red;
+}
+</style>
+{% endblock head %}
+
+
+{% block title %} 
+{% if editing %}
+Edit Contact
+{% else %}
+Add Contact
+{% endif %}
+{% endblock title %}
+
+
+{% block content %}
+<p></p>
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-xs-1 center block">
+			{% if editing %}
+			<h1>Edit Contact</h1>
+			{% else %}
+			<h1>Add Contact</h1>
+			{% endif %}
+		</div>
+	</div>
+	<p></p>
+	
+	<form method="POST">
+
+		{{ form.csrf_token }}
+		<div class="row">
+
+			<div class="col">
+		
+
+				<div class="card">
+					<div class="card-body">
+						<h4 class = "card-title"> Data Feed</h4>
+						<div class="form-group">
+							{{ form.supplier.label(class="form-control-label required") }}
+							{% if editing %}
+								{{ form.supplier(class="form-control", disabled=True) }}
+							{% else %}
+								{{ form.supplier(class="form-control") }}
+							{% endif %}
+						</div>
+				
+
+						<div class="form-group">
+							{{ form.distributor.label(class="form-control-label required") }}
+							{% if editing %}
+								{{ form.distributor(class="form-control", disabled=True) }}
+							{% else %}
+								{{ form.distributor(class="form-control") }}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<p></p>
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title"> Contact Settings </h4>
+						<div class="form-check form-check-inline">
+							{{ form.is_data_contact(class="form-check-input") }}
+							{{ form.is_data_contact.label(class="form-check-label") }}
+						</div>
+						<div class="form-check form-check-inline">
+							{{ form.is_supplier_contact(class="form-check-input") }}
+							{{ form.is_supplier_contact.label(class="form-check-label") }}
+						</div>
+						<div class="form-check form-check-inline">
+							{{ form.is_cc(class="form-check-input") }}
+							{{ form.is_cc.label(class="form-check-label") }}
+						</div>
+						<div class="form-check form-check-inline">
+							{{ form.is_bcc(class="form-check-input") }}
+							{{ form.is_bcc.label(class="form-check-label") }}
+						</div>
+						<p></p>
+						<p> <b>Data Contact</b> means look for emails from them and save files. Also they are the "to" address for both reminder messages. </p>
+						<p> <b>Supplier Contact</b> means that if selected they will be CC'ed on only the second reminder</p>
+						<p><b>CC</b> means CC this contact on both reminders</p>
+						<p><b>BCC</b> means BCC this contact on both reminders</p>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title"> Contact Info </h4>
+						{% if not editing %}
+							<div class="form-group">
+								{{ form.contact.label(class="form-control-label")}}
+								{{ form.contact(class="form-control")}}
+							</div>
+						{% endif %}
+						<div class="form-group">
+							{{ form.first_name.label(class="form-control-label required") }}
+							{{ form.first_name(class="form-control") }}
+						</div>
+						<div class="form-group">
+							{{ form.last_name.label(class="form-control-label required") }}
+							{{ form.last_name(class="form-control") }}
+						</div>
+						<div class="form-group">
+							{{ form.email.label(class="form-control-label required") }}
+							{{ form.email(class="form-control") }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<p></p>
+		<div class="row justify-content-center">
+			<div class="col-xs-1 center block">
+				<div class="form-group">
+					{{ form.submit(class="btn btn-success") }}
+					{% if editing %}
+					{{ form.unlink(class="btn btn-warning")}}
+					{{ form.delete(class="btn btn-danger")}}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+	</form>
+
+	<script>	
+
+		var delete_button = document.getElementById("delete");
+		if (delete_button != null){
+		delete_button.onclick = function () {
+			console.log("clicked delete")
+			if (confirm('Are you sure you want to delete this contact for all distributors?')){
+				delete_button.submit();
+			} 	else{
+				return false;
+			}
+		}
+		}
+
+		var unlink_button = document.getElementById("unlink");
+		if (unlink_button != null){
+			unlink_button.onclick = function() {
+			if (confirm('Are you sure you want to unlink this contact from the data feed?')){
+				unlinke_button.submit();
+			} 	else{
+				return false;
+			}
+		}
+		}
+
+
+
+		var supplier_select = document.getElementById("supplier");
+		var distributor_select = document.getElementById("distributor");
+
+		supplier_select.onchange = function () {
+
+			supplier = supplier_select.value;
+			fetch('/automation/select/distributor/' + supplier).then(function(response) {
+				response.json().then(function(data){
+					var optionHTML = '';
+					for (var d of data.distributors){
+						optionHTML += '<option value=' + d.id + '>' + d.distributor + '</option>';
+					}
+					distributor_select.innerHTML = optionHTML;
+				})
+			});
+		}
+
+		var contact_select = document.getElementById("contact");
+		var first_name = document.getElementById("first_name");
+		var last_name = document.getElementById("last_name");
+		var email = document.getElementById("email");
+		
+		contact_select.onchange = function () {
+
+			contact = contact_select.value;
+
+			if (contact > 0){
+
+				fetch('/automation/select/contact/info/' + contact).then(function(response) {
+					response.json().then(function(data){
+						contact = data.info[0];
+
+						console.log(contact);
+						first_name.value = contact.first_name;
+						first_name.disabled = true;
+
+						last_name.value = contact.last_name;
+						last_name.disabled = true;
+
+						email.value = contact.email;
+						email.disabled = true;
+					})
+				});
+			}
+			else{
+				first_name.value = "";
+				first_name.disabled = false;
+
+				last_name.value = "";
+				last_name.disabled = false;
+
+				email.value = "";
+				email.disabled = false;
+			}
+		}
+	</script>
+</div>
+{% endblock content %}

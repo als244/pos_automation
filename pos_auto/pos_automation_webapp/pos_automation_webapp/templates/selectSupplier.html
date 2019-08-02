@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block head %}  {% endblock head %}
+
+
+{% block title %} Edit Distributor {% endblock title %}
+
+
+{% block content %}
+<p></p>
+<div class="container">
+	
+	<div class="row justify-content-center">
+		<div class="col-xs-1 center block">
+			<h1>Select Supplier</h1>
+		</div>
+	</div>
+	<p></p>
+
+	<form method="POST">
+		{{ form.csrf_token }}
+		<div class="row justify-content-center">
+			<div class="col">
+				<div class="form-group">
+					{{ form.supplier.label(class="form-control-label") }}
+					{{ form.supplier(class="form-control form-control-lg") }}
+				</div>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-xs-1 center block">
+				<div class="form-group">
+					{{ form.submit(class="btn btn-outline-info") }}
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+{% endblock content %}
